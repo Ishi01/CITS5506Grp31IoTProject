@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+
+        hr {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        body {
+            height: 100%;
+            width: 100%;
+        {#background: url("../static/bg.jpg") no-repeat center;#} background: #191919 no-repeat center;
+            background-size: cover;
+        }
+
+        .top {
+            text-align: center;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .top div {
+            font-size: 36px;
+        }
+
+        .content {
+            width: 100%;
+            min-height: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px 0;
+        }
+
+        .header {
+            width: 100%;
+            height: 45%;
+            display: flex;
+            justify-content: space-evenly;
+            padding: 1vh 30px;
+        }
+
+        .header .gauge {
+            width: 40%;
+            min-width: 500px;
+            height: 400px;
+            border-radius: 5px;
+        }
+
+        .footer {
+            width: 100%;
+            height: 55%;
+            display: flex;
+            justify-content: center;
+            padding: 0 30px;
+        }
+
+        #line {
+            width: calc(90% - 60px);
+            min-width: 800px;
+            height: 400px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<script src="../static/echarts.min.js"></script>
+<div class="content">
+    <div class="top">
+        <div>CITS5506</div>
+        <div>The Internet of Things</div>
+        <div>Group Project Demo</div>
+        <div>IoT Based Noise Pollution Monitor</div>
+    </div>
+    <hr>
+    <div>
+        <h2>Sound Monitor data</h2>
+    </div>
+    <div class="header">
+        <div class="gauge" id="gauge1"></div>
+        <div class="gauge" id="gauge2"></div>
+    </div>
+    <hr>
+    <div class="footer">
+        <div id="line"></div>
+    </div>
+</div>
+
+
+<script type="application/javascript">
+    const setGaugeOption = function (data = 0.7, title = "Sensor") {
+        const gaugeOption = {
+            title: {
+                text: title
+            },
+            backgroundColor: "rgba(35,35,35,0.6)",
+            series: [
+                {
+                    type: 'gauge',
+                    startAngle: 180,
+                    endAngle: 0,
+                    center: ['50%', '75%'],
+                    radius: '90%',
+                    min: 0,
+                    max: 1,
+                    splitNumber: 20,
+                    axisLine: {
+                        lineStyle: {
+                            width: 2,
+                            color: [
+                                [0.4, '#7CFFB2'],
+                                [0.65, '#FDDD60'],
+                                [1, '#FF6E76']
+                            ]
+                        }
+                    },
+                    pointer: {
+                        icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+                        length: '12%',
+                        width: 10,
+                        offsetCenter: [0, '-60%'],
+                        itemStyle: {
+                            color: 'auto'
+                        }
+                    },
+                    axisTick: {
+                        length: 12,
+                        lineStyle: {
+                            color: 'auto',
+                            width: 2
+                        }
+                    },
+                    splitLine: {
+                        length: 15,
+                        lineStyle: {
+                            color: 'auto',
+                            width: 5
+                        }
+                    },
+                    axisLabel: {
+                        color: '#d9cccc',
+                        fontSize: 14,
+                        distance: -60,
+                        rotate: 'tangential',
+                        formatter: function (value) {
+                            if (value === 0.85) {
+                                return 'High';
+                            } else if (value === 0.5) {
+                                return 'Medium';
+                            } else if (value === 0.2) {
+                                return 'Normal';
+                            }
+                            return '';
+                        }
+                    },
+                    title: {
+                        offsetCenter: [0, '-10%'],
+                        fontSize: 20
+                    },
+                    detail: {
+                        fontSize: 30,
+                        offsetCenter: [0, '-35%'],
+                        valueAnimation: true,
+                        formatter: function (value) {
+                            return (value * 210).toFixed(2) + 'dB';
+                        },
+                        color: 'inherit'
+                    },
+                    data: [
+                        {
+                            value: data,
+                            name: 'Decibel'
+                        }
+                    ]
+                }
+            ]
+        };
+        return gaugeOption;
+    }
+    var chartDom = document.getElementById('gauge1');
+    var myChart = echarts.init(chartDom, 'dark');
+
+    var chartDom2 = document.getElementById('gauge2');
+    var myChart2 = echarts.init(chartDom2, 'dark');
+    console.log(myChart);
+    const getResult = function (chartName, data, title) {
+        const gaugeOption = setGaugeOption(data, title);
+        gaugeOption && chartName.setOption(gaugeOption);
+    }
+
+    const setLineOptions = function (x = [], y = []) {
+        return {
+            title: {
+                text: "All Day Real Time Monitor",
+                left: 'center',
+                textStyle: {
+                    fontSize: "24px"
+                }
+            },
+            backgroundColor: "rgba(35,35,35,0.6)",
+              dataZoom: [
+                {
+                  type: 'inside'
+                },
+                {
+                  type: 'slider'
+                }
+              ],
+            xAxis: {
+                type: 'category',
+                nameTextStyle: {
+                    color: "white",
+                },
+                data: x,
+                boundaryGap: false,
+                name: "Time",
+                axisLabel: {
+                    color: "white"
+                }
+            },
+            yAxis: {
+                name: "Average dB(dB)",
+                nameTextStyle: {
+                    color: "white",
+                },
+
+                type: 'value',
+                min: 0,
+                minInterval: 1,
+                max: 180,
+                splitNumber: 8,
+                axisLabel: {
+                    color: "white"
+                }
+            },
+            series: [
+                {
+                    data: y,
+                    type: 'line',
+                    smooth: true,
+                    markLine: {
+                        symbol: "none",
+                        data: [{
+                            type: "average"
+                        }],
+                        silent: true
+                    }
+                }
+            ]
+        };
+
+    }
+
+
+    var lineDom = document.getElementById('line');
+    var lineChart = echarts.init(lineDom, 'dark');
+    const setLineData = function (x, y) {
+
+        const lineOption = setLineOptions(x, y);
+        lineOption && lineChart.setOption(lineOption);
+    }
+
+    const setData = function (data) {
+        const {x, y} = data;
+
+        setLineData(x, y);
+    }
+
+    const setNewData = function (data) {
+        const {gauge1, gauge2} = data;
+        getResult(myChart, gauge1, "Sensor 1");
+        getResult(myChart2, gauge2, "Sensor 2");
+    }
+
+
+        const setData2 = function (data) {
+        const {x, y} = data;
+
+        lineChart.setOption({
+            xAxis: [{
+                data: x,
+            }],
+            series: [
+                {
+                    data: y,
+                }
+            ]
+
+        })
+    }
+
+    const setNewData2 = function (data) {
+        const {gauge1, gauge2} = data;
+        myChart.setOption({
+            series: {
+                data: [{
+                    value: gauge1,
+                }]
+            }
+
+        });
+        myChart2.setOption({
+            series: {
+                data: [{
+                    value: gauge2,
+                }]
+            }
+
+        });
+    }
+
+    const getData = function (init = false) {
+        // 创建一个新的XMLHttpRequest对象
+        const xhr = new XMLHttpRequest();
+
+        // 配置请求，包括请求方法和URL
+        xhr.open("GET", "/getData", true);
+
+        // 设置一个回调函数来处理响应
+        xhr.onload = function () {
+            const res = JSON.parse(xhr.responseText);
+            if (init) {
+                setData(res);
+            } else {
+                setData2(res)
+            }
+
+        };
+
+        // 发送请求
+        xhr.send();
+
+    }
+    getData(true);
+
+     const getNewData = function (init = false) {
+        // 创建一个新的XMLHttpRequest对象
+        const xhr = new XMLHttpRequest();
+
+        // 配置请求，包括请求方法和URL
+        xhr.open("GET", "/getNewData", true);
+
+        // 设置一个回调函数来处理响应
+        xhr.onload = function () {
+            const res = JSON.parse(xhr.responseText);
+            if (init) {
+                setNewData(res);
+            } else {
+                setNewData2(res)
+            }
+
+        };
+
+        // 发送请求
+        xhr.send();
+
+    }
+    getNewData(true);
+    setInterval(getData, 10000);
+    setInterval(getNewData, 2000);
+
+</script>
+</body>
+</html>
